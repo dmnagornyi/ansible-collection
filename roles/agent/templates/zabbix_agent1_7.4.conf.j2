@@ -1,5 +1,5 @@
 {{ ansible_managed | comment }}
-# This is a configuration file for Zabbix agent 2 (Unix)
+# This is a configuration file for Zabbix agent daemon (Unix)
 # To get more information about Zabbix, visit https://www.zabbix.com
 
 ############ GENERAL PARAMETERS #################
@@ -9,7 +9,7 @@
 #
 # Mandatory: no
 # Default:
-# PidFile=/tmp/zabbix_agent2.pid
+# PidFile=/tmp/zabbix_agentd.pid
 {% if agent_param_pidfile is defined and agent_param_pidfile %}
 
 PidFile={{ agent_param_pidfile }}
@@ -34,7 +34,7 @@ LogType={{ agent_param_logtype }}
 #
 # Mandatory: yes, if LogType is set to file, otherwise no
 # Default:
-# LogFile=/tmp/zabbix_agent2.log
+# LogFile=
 {% if agent_param_logfile is defined and agent_param_logfile %}
 
 LogFile={{ agent_param_logfile }}
@@ -82,6 +82,69 @@ DebugLevel={{ agent_param_debuglevel }}
 SourceIP={{ agent_param_sourceip }}
 {% endif %}
 
+### Option: AllowKey
+#	Allow execution of item keys matching pattern.
+#	Multiple keys matching rules may be defined in combination with DenyKey.
+#	Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
+#	Parameters are processed one by one according their appearance order.
+#	If no AllowKey or DenyKey rules defined, all keys are allowed.
+#
+# Mandatory: no
+{% if agent_param_allowkey is defined and agent_param_allowkey is iterable and agent_param_allowkey is not string and agent_param_allowkey is not mapping %}
+
+{% for unit in agent_param_allowkey %}
+AllowKey={{ unit }}
+{% endfor %}
+{% elif agent_param_allowkey is defined and agent_param_allowkey and agent_param_allowkey is string %}
+
+AllowKey={{ agent_param_allowkey }}
+{% endif %}
+
+### Option: DenyKey
+#	Deny execution of items keys matching pattern.
+#	Multiple keys matching rules may be defined in combination with AllowKey.
+#	Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
+#	Parameters are processed one by one according their appearance order.
+#	If no AllowKey or DenyKey rules defined, all keys are allowed.
+#       Unless another system.run[*] rule is specified DenyKey=system.run[*] is added by default.
+#
+# Mandatory: no
+# Default:
+# DenyKey=system.run[*]
+{% if agent_param_denykey is defined and agent_param_denykey is iterable and agent_param_denykey is not string and agent_param_denykey is not mapping %}
+
+{% for unit in agent_param_denykey %}
+DenyKey={{ unit }}
+{% endfor %}
+{% elif agent_param_denykey is defined and agent_param_denykey and agent_param_denykey is string %}
+
+DenyKey={{ agent_param_denykey }}
+{% endif %}
+
+### Option: EnableRemoteCommands - Deprecated, use AllowKey=system.run[*] or DenyKey=system.run[*] instead
+#	Internal alias for AllowKey/DenyKey parameters depending on value:
+#	0 - DenyKey=system.run[*]
+#	1 - AllowKey=system.run[*]
+#
+# Mandatory: no
+{% if agent_param_enableremotecommands is defined and (agent_param_enableremotecommands or agent_param_enableremotecommands is number) %}
+
+EnableRemoteCommands={{ agent_param_enableremotecommands }}
+{% endif %}
+
+### Option: LogRemoteCommands
+#	Enable logging of executed shell commands as warnings.
+#	0 - disabled
+#	1 - enabled
+#
+# Mandatory: no
+# Default:
+# LogRemoteCommands=0
+{% if agent_param_logremotecommands is defined and (agent_param_logremotecommands or agent_param_logremotecommands is number) %}
+
+LogRemoteCommands={{ agent_param_logremotecommands }}
+{% endif %}
+
 ##### Passive checks related
 
 ### Option: Server
@@ -92,9 +155,7 @@ SourceIP={{ agent_param_sourceip }}
 #	'0.0.0.0/0' can be used to allow any IPv4 address.
 #	Example: Server=127.0.0.1,192.168.1.0/24,::1,2001:db8::/32,zabbix.example.com
 #
-#   If left empty or not set will disable passive checks, and Zabbix agent 2 will not listen on the ListenPort.
-#
-# Mandatory: no
+# Mandatory: yes, if StartAgents is not explicitly set to 0
 # Default:
 # Server=
 {% if agent_param_server is defined and agent_param_server is iterable and agent_param_server is not string and agent_param_server is not mapping %}
@@ -132,16 +193,17 @@ ListenIP={{ agent_param_listenip | join(',') }}
 ListenIP={{ agent_param_listenip }}
 {% endif %}
 
-### Option: StatusPort
-#	Agent will listen on this port for HTTP status requests.
+### Option: StartAgents
+#	Number of pre-forked instances of zabbix_agentd that process passive checks.
+#	If set to 0, disables passive checks and the agent will not listen on any TCP port.
 #
 # Mandatory: no
-# Range: 1024-32767
+# Range: 0-100
 # Default:
-# StatusPort=
-{% if agent_param_statusport is defined and (agent_param_statusport or agent_param_statusport is number) %}
+# StartAgents=10
+{% if agent_param_startagents is defined and (agent_param_startagents or agent_param_startagents is number) %}
 
-StatusPort={{ agent_param_statusport }}
+StartAgents={{ agent_param_startagents }}
 {% endif %}
 
 ##### Active checks related
@@ -296,53 +358,29 @@ BufferSend={{ agent_param_buffersend }}
 ### Option: BufferSize
 #	Maximum number of values in a memory buffer. The agent will send
 #	all collected data to Zabbix Server or Proxy if the buffer is full.
-#	Option is not valid if EnablePersistentBuffer=1
 #
 # Mandatory: no
 # Range: 2-65535
 # Default:
-# BufferSize=1000
+# BufferSize=100
 {% if agent_param_buffersize is defined and (agent_param_buffersize or agent_param_buffersize is number) %}
 
 BufferSize={{ agent_param_buffersize }}
 {% endif %}
 
-### Option: EnablePersistentBuffer
-#	Enable usage of local persistent storage for active items.
-#	0 - disabled, in-memory buffer is used (default); 1 - use persistent buffer
-# Mandatory: no
-# Range: 0-1
-# Default:
-# EnablePersistentBuffer=0
-{% if agent_param_enablepersistentbuffer is defined and (agent_param_enablepersistentbuffer or agent_param_enablepersistentbuffer is number) %}
-
-EnablePersistentBuffer={{ agent_param_enablepersistentbuffer }}
-{% endif %}
-
-### Option: PersistentBufferPeriod
-#	Zabbix Agent2 will keep data for this time period in case of no
-#	connectivity with Zabbix server or proxy. Older data will be lost. Log data will be preserved.
-#	Option is valid if EnablePersistentBuffer=1
+### Option: MaxLinesPerSecond
+#	Maximum number of new lines the agent will send per second to Zabbix Server
+#	or Proxy processing 'log' and 'logrt' active checks.
+#	The provided value will be overridden by the parameter 'maxlines',
+#	provided in 'log' or 'logrt' item keys.
 #
 # Mandatory: no
-# Range: 1m-365d
+# Range: 1-1000
 # Default:
-# PersistentBufferPeriod=1h
-{% if agent_param_persistentbufferperiod is defined and (agent_param_persistentbufferperiod or agent_param_persistentbufferperiod is number) %}
+# MaxLinesPerSecond=20
+{% if agent_param_maxlinespersecond is defined and (agent_param_maxlinespersecond or agent_param_maxlinespersecond is number) %}
 
-PersistentBufferPeriod={{ agent_param_persistentbufferperiod }}
-{% endif %}
-
-### Option: PersistentBufferFile
-#	Full filename. Zabbix Agent2 will keep SQLite database in this file.
-#	Option is valid if EnablePersistentBuffer=1
-#
-# Mandatory: no
-# Default:
-# PersistentBufferFile=
-{% if agent_param_persistentbufferfile is defined and agent_param_persistentbufferfile %}
-
-PersistentBufferFile={{ agent_param_persistentbufferfile }}
+MaxLinesPerSecond={{ agent_param_maxlinespersecond }}
 {% endif %}
 
 ### Option: HeartbeatFrequency
@@ -386,6 +424,33 @@ HeartbeatFrequency={{ agent_param_heartbeatfrequency }}
 Timeout={{ agent_param_timeout }}
 {% endif %}
 
+### Option: AllowRoot
+#	Allow the agent to run as 'root'. If disabled and the agent is started by 'root', the agent
+#	will try to switch to the user specified by the User configuration option instead.
+#	Has no effect if started under a regular user.
+#	0 - do not allow
+#	1 - allow
+#
+# Mandatory: no
+# Default:
+# AllowRoot=0
+{% if agent_param_allowroot is defined and (agent_param_allowroot or agent_param_allowroot is number) %}
+
+AllowRoot={{ agent_param_allowroot }}
+{% endif %}
+
+### Option: User
+#	Drop privileges to a specific, existing user on the system.
+#	Only has effect if run as 'root' and AllowRoot is disabled.
+#
+# Mandatory: no
+# Default:
+# User=zabbix
+{% if agent_param_user is defined and agent_param_user %}
+
+User={{ agent_param_user }}
+{% endif %}
+
 ### Option: Include
 #	You may include individual files or all files in a directory in the configuration file.
 #	Installing Zabbix will create include directory in /usr/local/etc, unless modified during the compile time.
@@ -398,37 +463,11 @@ Timeout={{ agent_param_timeout }}
 {% for unit in agent_param_include %}
 Include={{ unit }}
 {% endfor %}
-{% elif agent_param_include is defined and agent_param_include and agent_param_include is string %}
-
-Include={{ agent_param_include }}
 {% endif %}
 
-# Include=/usr/local/etc/zabbix_agent2.userparams.conf
-# Include=/usr/local/etc/zabbix_agent2.conf.d/
-# Include=/usr/local/etc/zabbix_agent2.conf.d/*.conf
-
-### Option:PluginTimeout
-#	Timeout for connections with external plugins.
-#
-# Mandatory: no
-# Range: 1-30
-# Default: <Global timeout>
-# PluginTimeout=
-{% if agent_param_plugintimeout is defined and (agent_param_plugintimeout or agent_param_plugintimeout is number) %}
-
-PluginTimeout={{ agent_param_plugintimeout }}
-{% endif %}
-
-### Option:PluginSocket
-#	Path to unix socket for external plugin communications.
-#
-# Mandatory: no
-# Default:/tmp/agent.plugin.sock
-# PluginSocket=
-{% if agent_param_pluginsocket is defined and agent_param_pluginsocket %}
-
-PluginSocket={{ agent_param_pluginsocket }}
-{% endif %}
+# Include=/usr/local/etc/zabbix_agentd.userparams.conf
+# Include=/usr/local/etc/zabbix_agentd.conf.d/
+# Include=/usr/local/etc/zabbix_agentd.conf.d/*.conf
 
 ####### USER-DEFINED MONITORED PARAMETERS #######
 
@@ -472,15 +511,42 @@ UnsafeUserParameters={{ agent_param_unsafeuserparameters }}
 UserParameterDir={{ agent_param_userparameterdir }}
 {% endif %}
 
-### Option: ControlSocket
-#	The control socket, used to send runtime commands with '-R' option.
+####### LOADABLE MODULES #######
+
+### Option: LoadModulePath
+#	Full path to location of agent modules.
+#	Default depends on compilation options.
+#	To see the default path run command "zabbix_agentd --help".
 #
 # Mandatory: no
 # Default:
-# ControlSocket=
-{% if agent_param_controlsocket is defined and agent_param_controlsocket %}
+# LoadModulePath=${libdir}/modules
+{% if agent_param_loadmodulepath is defined and agent_param_loadmodulepath %}
 
-ControlSocket={{ agent_param_controlsocket }}
+LoadModulePath={{ agent_param_loadmodulepath }}
+{% endif %}
+
+### Option: LoadModule
+#	Module to load at agent startup. Modules are used to extend functionality of the agent.
+#	Formats:
+#		LoadModule=<module.so>
+#		LoadModule=<path/module.so>
+#		LoadModule=</abs_path/module.so>
+#	Either the module must be located in directory specified by LoadModulePath or the path must precede the module name.
+#	If the preceding path is absolute (starts with '/') then LoadModulePath is ignored.
+#	It is allowed to include multiple LoadModule parameters.
+#
+# Mandatory: no
+# Default:
+# LoadModule=
+{% if agent_param_loadmodule is defined and agent_param_loadmodule is iterable and agent_param_loadmodule is not string and agent_param_loadmodule is not mapping %}
+
+{% for unit in agent_param_loadmodule %}
+LoadModule={{ unit }}
+{% endfor %}
+{% elif agent_param_loadmodule is defined and agent_param_loadmodule and agent_param_loadmodule is string %}
+
+LoadModule={{ agent_param_loadmodule }}
 {% endif %}
 
 ####### TLS-RELATED PARAMETERS #######
@@ -590,7 +656,9 @@ TLSCertFile={{ agent_param_tlscertfile }}
 # Mandatory: no
 # Default:
 # TLSKeyFile=
-{% if agent_param_tlskeyfile is defined and agent_param_tlskeyfile %}
+{% if agent_param_tlskeyfile is defined and agent_param_tlskeyfile
+   and (agent_param_tlsaccept is defined and (agent_param_tlsaccept == "cert" or "cert" in agent_param_tlsaccept)
+        or agent_param_tlsconnect == "cert") %}
 
 TLSKeyFile={{ agent_param_tlskeyfile }}
 {% endif %}
@@ -621,108 +689,6 @@ TLSPSKIdentity={{ agent_param_tlspskidentity }}
 TLSPSKFile={{ agent_param_tlspskfile }}
 {% endif %}
 
-####### PLUGIN-SPECIFIC PARAMETERS #######
-
-### Option: Plugins
-#	A plugin can have one or more plugin specific configuration parameters in format:
-#     Plugins.<PluginName>.<Parameter1>=<value1>
-#     Plugins.<PluginName>.<Parameter2>=<value2>
-#
-# Mandatory: no
-# Range:
-# Default:
-
-### Option: Plugins.Log.MaxLinesPerSecond
-#	Maximum number of new lines the agent will send per second to Zabbix Server
-#	or Proxy processing 'log' and 'logrt' active checks.
-#	The provided value will be overridden by the parameter 'maxlines',
-#	provided in 'log' or 'logrt' item keys.
-#
-# Mandatory: no
-# Range: 1-1000
-# Default:
-# Plugins.Log.MaxLinesPerSecond=20
-{% if agent_param_plugins_log_maxlinespersecond is defined and (agent_param_plugins_log_maxlinespersecond or agent_param_plugins_log_maxlinespersecond is number) %}
-
-Plugins.Log.MaxLinesPerSecond={{ agent_param_plugins_log_maxlinespersecond }}
-{% endif %}
-
-### Option: AllowKey
-#	Allow execution of item keys matching pattern.
-#	Multiple keys matching rules may be defined in combination with DenyKey.
-#	Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
-#	Parameters are processed one by one according their appearance order.
-#	If no AllowKey or DenyKey rules defined, all keys are allowed.
-#
-# Mandatory: no
-{% if agent_param_allowkey is defined and agent_param_allowkey is iterable and agent_param_allowkey is not string and agent_param_allowkey is not mapping %}
-
-{% for unit in agent_param_allowkey %}
-AllowKey={{ unit }}
-{% endfor %}
-{% elif agent_param_allowkey is defined and agent_param_allowkey and agent_param_allowkey is string %}
-
-AllowKey={{ agent_param_allowkey }}
-{% endif %}
-
-### Option: DenyKey
-#	Deny execution of items keys matching pattern.
-#	Multiple keys matching rules may be defined in combination with AllowKey.
-#	Key pattern is wildcard expression, which support "*" character to match any number of any characters in certain position. It might be used in both key name and key arguments.
-#	Parameters are processed one by one according their appearance order.
-#	If no AllowKey or DenyKey rules defined, all keys are allowed.
-#       Unless another system.run[*] rule is specified DenyKey=system.run[*] is added by default.
-#
-# Mandatory: no
-# Default:
-# DenyKey=system.run[*]
-{% if agent_param_denykey is defined and agent_param_denykey is iterable and agent_param_denykey is not string and agent_param_denykey is not mapping %}
-
-{% for unit in agent_param_denykey %}
-DenyKey={{ unit }}
-{% endfor %}
-{% elif agent_param_denykey is defined and agent_param_denykey and agent_param_denykey is string %}
-
-DenyKey={{ agent_param_denykey }}
-{% endif %}
-
-### Option: Plugins.SystemRun.LogRemoteCommands
-#	Enable logging of executed shell commands as warnings.
-#	0 - disabled
-#	1 - enabled
-#
-# Mandatory: no
-# Default:
-# Plugins.SystemRun.LogRemoteCommands=0
-{% if agent_param_plugins_systemrun_logremotecommands is defined and (agent_param_plugins_systemrun_logremotecommands or agent_param_plugins_systemrun_logremotecommands is number) %}
-
-Plugins.SystemRun.LogRemoteCommands={{ agent_param_plugins_systemrun_logremotecommands }}
-{% endif %}
-
-### Option: ForceActiveChecksOnStart
-#	Perform active checks immediately after restart for first received configuration.
-#	Also available as per plugin configuration, example: Plugins.Uptime.System.ForceActiveChecksOnStart=1
-#
-# Mandatory: no
-# Range: 0-1
-# Default:
-# ForceActiveChecksOnStart=0
-{% if agent_param_forceactivechecksonstart is defined and (agent_param_forceactivechecksonstart or agent_param_forceactivechecksonstart is number) %}
-
-ForceActiveChecksOnStart={{ agent_param_forceactivechecksonstart }}
-{% endif %}
-
-# Include configuration files for plugins
-{% if agent_param_includeplugins is defined and agent_param_includeplugins is iterable and agent_param_includeplugins is not string and agent_param_includeplugins is not mapping %}
-
-{% for unit in agent_param_includeplugins %}
-Include={{ unit }}
-{% endfor %}
-{% elif agent_param_includeplugins is defined and agent_param_includeplugins and agent_param_includeplugins is string %}
-
-Include={{ agent_param_includeplugins }}
-{% endif %}
-
 ####### For advanced users - TLS ciphersuite selection criteria #######
 
 ### Option: TLSCipherCert13
@@ -740,9 +706,11 @@ TLSCipherCert13={{ agent_param_tlsciphercert13 }}
 {% endif %}
 
 ### Option: TLSCipherCert
-#	OpenSSL (TLS 1.2) cipher string.
+#	GnuTLS priority string or OpenSSL (TLS 1.2) cipher string.
 #	Override the default ciphersuite selection criteria for certificate-based encryption.
-#	Example:
+#	Example for GnuTLS:
+#		NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509
+#	Example for OpenSSL:
 #		EECDH+aRSA+AES128:RSA+aRSA+AES128
 #
 # Mandatory: no
@@ -772,9 +740,11 @@ TLSCipherPSK13={{ agent_param_tlscipherpsk13 }}
 {% endif %}
 
 ### Option: TLSCipherPSK
-#	OpenSSL (TLS 1.2) cipher string.
+#	GnuTLS priority string or OpenSSL (TLS 1.2) cipher string.
 #	Override the default ciphersuite selection criteria for PSK-based encryption.
-#	Example:
+#	Example for GnuTLS:
+#		NONE:+VERS-TLS1.2:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL
+#	Example for OpenSSL:
 #		kECDHEPSK+AES128:kPSK+AES128
 #
 # Mandatory: no
@@ -804,9 +774,11 @@ TLSCipherAll13={{ agent_param_tlscipherall13 }}
 {% endif %}
 
 ### Option: TLSCipherAll
-#	OpenSSL (TLS 1.2) cipher string.
+#	GnuTLS priority string or OpenSSL (TLS 1.2) cipher string.
 #	Override the default ciphersuite selection criteria for certificate- and PSK-based encryption.
-#	Example:
+#	Example for GnuTLS:
+#		NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509
+#	Example for OpenSSL:
 #		EECDH+aRSA+AES128:RSA+aRSA+AES128:kECDHEPSK+AES128:kPSK+AES128
 #
 # Mandatory: no
@@ -817,4 +789,19 @@ TLSCipherAll13={{ agent_param_tlscipherall13 }}
         or agent_param_tlsconnect in ["psk", "cert"]) %}
 
 TLSCipherAll={{ agent_param_tlscipherall }}
+{% endif %}
+
+####### For advanced users - TCP-related fine-tuning parameters #######
+
+## Option: ListenBacklog
+#       The maximum number of pending connections in the queue. This parameter is passed to
+#       listen() function as argument 'backlog' (see "man listen").
+#
+# Mandatory: no
+# Range: 0 - INT_MAX (depends on system, too large values may be silently truncated to implementation-specified maximum)
+# Default: SOMAXCONN (hard-coded constant, depends on system)
+# ListenBacklog=
+{% if agent_param_listenbacklog is defined and (agent_param_listenbacklog or agent_param_listenbacklog is number) %}
+
+ListenBacklog={{ agent_param_listenbacklog }}
 {% endif %}

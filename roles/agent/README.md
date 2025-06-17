@@ -40,6 +40,7 @@ Table of contents
         * [PostgreSQL plugin parameters](#zabbix-agent-2-postgresql-plugin-parameters)
         * [MySQL plugin parameters](#zabbix-agent-2-mysql-plugin-parameters)
         * [MSSQL plugin parameters](#zabbix-agent-2-mssql-plugin-parameters)
+        * [NVIDIA GPU plugin parameters](#zabbix-agent-2-nvidia-gpu-plugin-parameters)
         * [Redis plugin parameters](#zabbix-agent-2-redis-plugin-parameters)
         * [Smart plugin parameters](#zabbix-agent-2-smart-plugin-parameters)
   * [Hints & Tags](#hints--tags)
@@ -69,7 +70,7 @@ The role contains firewalld application rule to allow agent listen port. Firewal
 
 Multiple tasks require `superuser` privileges (sudo).
 
-Ansible core >= 2.16
+Ansible core >= 2.17
 
 Zabbix agent role requires additional tools from two Ansible certified collections:
 - ansible.posix >= 2.8
@@ -243,6 +244,12 @@ These parameters are common for both agent variants
 | agent_param_tlscafile | `string` || [**TLSCAFile**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscafile) | Path to the top-level CA(s) certificates for peer certificate verification. Use only when [`agent_source_tlscafile`](#local-paths-variables-table) is not defined!
 | agent_param_tlscertfile | `string` || [**TLSCertFile**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscertfile) | Path to the agent certificate or certificate chain. Use only when [`agent_source_tlscertfile`](#local-paths-variables-table) is not defined!
 | agent_param_tlscrlfile | `string` || [**TLSCRLFile**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscrlfile) | Path to revoked certificates. Use only when [`agent_source_tlscrlfile`](#local-paths-variables-table) is not defined!
+| agent_param_tlscipherall | `string` || [**TLSCipherAll**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherall) | Override the default ciphersuite selection criteria for certificate- and PSK-based encryption.
+| agent_param_tlscipherall13 | `string` || [**TLSCipherAll13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherall13) | Override the default ciphersuite selection criteria for certificate- and PSK-based encryption.
+| agent_param_tlsciphercert | `string` || [**TLSCipherCert**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlsciphercert) | Override the default ciphersuite selection criteria for certificate-based encryption.
+| agent_param_tlsciphercert13 | `string` || [**TLSCipherCert13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlsciphercert13) | Override the default ciphersuite selection criteria for certificate-based encryption.
+| agent_param_tlscipherpsk | `string` || [**TLSCipherPSK**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherpsk) | Override the default ciphersuite selection criteria for PSK-based encryption.
+| agent_param_tlscipherpsk13 | `string` || [**TLSCipherPSK13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherpsk13) | Override the default ciphersuite selection criteria for PSK-based encryption.
 | agent_param_tlskeyfile | `string` || [**TLSKeyFile**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlskeyfile) | Path to the agent private key. Use only when [`agent_source_tlskeyfile`](#local-paths-variables-table) is not defined!
 | agent_param_tlspskidentity | `string` | `PSK_ID_{{ inventory_hostname }}` | [**TLSPSKIdentity**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlspskidentity) | Pre-shared key identity string used for encrypted communications with Zabbix server. Default value uses prefixed hostname from inventory.
 | agent_param_tlsservercertissuer | `string` || [**TLSServerCertIssuer**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlsservercertissuer) | Allowed server (proxy) certificate issuer.
@@ -263,12 +270,6 @@ These parameters are common for both agent variants
 | agent_param_logremotecommands | `int` || [**LogRemoteCommands**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#logremotecommands) | Enable logging of executed shell commands as warnings.
 | agent_param_maxlinespersecond | `int` || [**MaxLinesPerSecond**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#maxlinespersecond) | Maximum number of new lines per second that the agent will send to Zabbix server or proxy when processing 'log' and 'logrt' active checks.
 | agent_param_startagents | `int` || [**StartAgents**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#startagents) | Number of pre-forked instances of zabbix_agentd processing the passive checks.
-| agent_param_tlscipherall | `string` || [**TLSCipherAll**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherall) | Override the default ciphersuite selection criteria for certificate- and PSK-based encryption.
-| agent_param_tlscipherall13 | `string` || [**TLSCipherAll13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherall13) | Override the default ciphersuite selection criteria for certificate- and PSK-based encryption.
-| agent_param_tlsciphercert | `string` || [**TLSCipherCert**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlsciphercert) | Override the default ciphersuite selection criteria for certificate-based encryption.
-| agent_param_tlsciphercert13 | `string` || [**TLSCipherCert13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlsciphercert13) | Override the default ciphersuite selection criteria for certificate-based encryption.
-| agent_param_tlscipherpsk | `string` || [**TLSCipherPSK**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherpsk) | Override the default ciphersuite selection criteria for PSK-based encryption.
-| agent_param_tlscipherpsk13 | `string` || [**TLSCipherPSK13**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#tlscipherpsk13) | Override the default ciphersuite selection criteria for PSK-based encryption.
 | agent_param_user | `string` || [**User**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agentd#user) | Drop privileges to a specific user existing in the system.
 
 ### Zabbix **agent 2** unique parameters:
@@ -287,6 +288,7 @@ These parameters are common for both agent variants
 | agent_param_refreshactivechecks | `int` || [**RefreshActiveChecks**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2#refreshactivechecks) | How often the list of active checks is refreshed.
 | agent_param_statusport | `int` || [**StatusPort**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2#statusport) | If set, the agent will listen on this port for HTTP status requests (`http://localhost:<port>/status`).
 | agent_param_includeplugins | `list` | ["/etc/zabbix/zabbix_agent2.d/plugins.d/*.conf"] | [**Include**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2#include) | Path to plugin configuration files. You may include individual files or all files in a directory in the configuration file.
+
 ### Zabbix **agent 2 Ceph plugin** parameters:
 
 For these settings to take effect, the plugin should be listed in [`agent_2_plugin_list`](#general-settings).
@@ -344,7 +346,7 @@ Don't use both local path and final path to avoid unpredictable results!
 |--|--|--|--|--|
 | agent_param_plugins_mongodb_keepalive | `int` || [**Plugins.MongoDB.KeepAlive**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Maximum time of waiting (in seconds) before unused plugin connections are closed.
 | agent_param_plugins_mongodb_timeout | `int` || [**Plugins.MongoDB.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Request execution timeout (how long to wait for a request to complete before shutting it down).
-| agent_param_plugins_mongodb_system_path | `string` | /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb | [**Plugins.MongoDB.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Path to external plugin executable. Supported since Zabbix 6.0.6.
+| agent_param_plugins_mongodb_system_path | `string` | **Zabbix version <=7.0:** /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb **Zabbix version >= 7.2:** /usr/libexec/zabbix/zabbix-agent2-plugin-mongodb | [**Plugins.MongoDB.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Path to external plugin executable. Supported since Zabbix 6.0.6.
 | agent_param_plugins_mongodb_sessions | `list of dictionaries` || [**Plugins.MongoDB.Sessions**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Holds the list of connection credentials in dictionary form with the keys: `{ name: "", uri: "", user: "", password: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: ""}`
 | agent_param_plugins_mongodb_default | `dictionary` || [**Plugins.MongoDB.Default**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mongodb_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "",}`
 
@@ -395,7 +397,7 @@ Don't use both local path and final path to avoid unpredictable results!
 | agent_param_plugins_postgresql_customqueriespath | `string` || [**Plugins.Postgresql.CustomQueriesPath**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Full pathname of the directory containing .sql files with custom queries. Disabled by default. Example: /etc/zabbix/postgresql/sql
 | agent_param_plugins_postgresql_keepalive | `int` || [**Plugins.Postgresql.KeepAlive**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Time of waiting (in seconds) for unused connections to be closed.
 | agent_param_plugins_postgresql_timeout | `int` || [**Plugins.Postgresql.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Maximum time of waiting (in seconds) for a connection to be established.
-| agent_param_plugins_postgresql_system_path | `string` | /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql | [**Plugins.Postgresql.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Path to the external plugin executable. Supported since Zabbix 6.0.6.
+| agent_param_plugins_postgresql_system_path | `string` | **Zabbix version <=7.0:** /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql **Zabbix version >= 7.2:** /usr/libexec/zabbix/zabbix-agent2-plugin-postgresql | [**Plugins.Postgresql.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Path to the external plugin executable. Supported since Zabbix 6.0.6.
 | agent_param_plugins_postgresql_sessions | `list of dictionaries` || [**Plugins.Postgresql.Sessions**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Holds the list of connection credentials in dictionary form with the keys: `{ name: "", uri: "", user: "", password: "", database: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: "", cahcemode: ""}`
 | agent_param_plugins_postgresql_default | `dictionary` || [**Plugins.Postgresql.Default**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/postgresql_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "", database: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: "", cachemode: ""}`
 
@@ -418,7 +420,7 @@ Don't use both local path and final path to avoid unpredictable results!
 | agent_param_plugins_mysql_timeout | `int` | [**Plugins.Mysql.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mysql_plugin) | Maximum time of waiting (in seconds) for a connection to be established.
 | agent_param_plugins_mysql_customqueriespath | `string` | [**Plugins.Mysql.CustomQueriesPath**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mysql_plugin) | Full pathname of a directory containing *.sql* files with custom queries.
 | agent_param_plugins_mysql_sessions | `list of dictionaries` | [**Plugins.Mysql.Sessions**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mysql_plugin) | Holds the list of connection credentials in dictionary form with the keys: `{ name: "", uri: "", user: "", password: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: ""}`
-| agent_param_plugins_mysql_default | dictionary | [**Plugins.Mysql.Default.\***](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mysql_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: ""}`
+| agent_param_plugins_mysql_default | `dictionary` | [**Plugins.Mysql.Default.\***](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mysql_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "", tlsconnect: "", source_tlscafile: "", source_tlscertfile: "", source_tlskeyfile: ""}`
 
 ### Zabbix **agent 2 MSSQL plugin** parameters:
 
@@ -431,14 +433,23 @@ Here is the dictionary skeleton for self-managed certificate files:
 
 Don't use both local path and final path to avoid unpredictable results!
 
-| Variable | Type | Parameter | Description |
-|--|--|--|--|
-| agent_param_plugins_mssql_keepalive | `int` | [**Plugins.MSSQL.KeepAlive**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Time of waiting (in seconds) before unused connections are closed.
-| agent_param_plugins_mssql_timeout | `int` | [**Plugins.MSSQL.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | The amount of time to wait for a server to respond when first connecting and on follow-up operations in the session.
-| agent_param_plugins_mssql_customqueriespath | `string` | [**Plugins.MSSQL.CustomQueriesPath**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Full pathname of a directory containing *.sql* files with custom queries. Changes requires Zabbix agent2 restart.
-| agent_param_plugins_mssql_system_path | `string` | /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mssql | [**Plugins.MSSQL.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Path to the external plugin executable.
-| agent_param_plugins_mssql_sessions | `list of dictionaries` | [**Plugins.MSSQL.Sessions**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Holds the list of connection credentials in dictionary form with the keys: `{ name: "", uri: "", user: "", password: "", source_cacertpath: "", trustservercertificate: "", hostnameincertificate: "", encrypt: "", tlsminversion: ""}`
-| agent_param_plugins_mssql_default | dictionary | [**Plugins.MSSQL.Default.\***](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "", source_cacertpath: "", trustservercertificate: "", hostnameincertificate: "", encrypt: "", tlsminversion: ""}`
+| Variable | Type | Default | Parameter | Description |
+|--|--|--|--|--|
+| agent_param_plugins_mssql_keepalive | `int` || [**Plugins.MSSQL.KeepAlive**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Time of waiting (in seconds) before unused connections are closed.
+| agent_param_plugins_mssql_timeout | `int` || [**Plugins.MSSQL.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | The amount of time to wait for a server to respond when first connecting and on follow-up operations in the session.
+| agent_param_plugins_mssql_customqueriespath | `string` || [**Plugins.MSSQL.CustomQueriesPath**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Full pathname of a directory containing *.sql* files with custom queries. Changes requires Zabbix agent2 restart.
+| agent_param_plugins_mssql_system_path | `string` | **Zabbix version <=7.0:** /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mssql **Zabbix version >= 7.2:** /usr/libexec/zabbix/zabbix-agent2-plugin-mssql | [**Plugins.MSSQL.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Path to the external plugin executable.
+| agent_param_plugins_mssql_sessions | `list of dictionaries` || [**Plugins.MSSQL.Sessions**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Holds the list of connection credentials in dictionary form with the keys: `{ name: "", uri: "", user: "", password: "", source_cacertpath: "", trustservercertificate: "", hostnameincertificate: "", encrypt: "", tlsminversion: ""}`
+| agent_param_plugins_mssql_default | `dictionary` || [**Plugins.MSSQL.Default.\***](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/mssql_plugin) | Holds the default connection credentials in dictionary form with the keys: `{ uri: "", user: "", password: "", source_cacertpath: "", trustservercertificate: "", hostnameincertificate: "", encrypt: "", tlsminversion: ""}`
+
+### Zabbix **agent 2 NVIDIA GPU plugin** parameters:
+
+For these settings to take effect, the plugin should be listed in [`agent_2_plugin_list`](#general-settings).
+
+| Variable | Type | Default | Parameter | Description |
+|--|--|--|--|--|
+| agent_param_plugins_nvidia_system_path | `string` | /usr/libexec/zabbix/zabbix-agent2-plugin-nvidia-gpu | [**Plugins.NVIDIA.System.Path**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/nvidia_gpu) | Path to the NVIDIA GPU plugin executable.
+| agent_param_plugins_nvidia_timeout | `int` || [**Plugins.NVIDIA.Timeout**](https://www.zabbix.com/documentation/current/en/manual/appendix/config/zabbix_agent2_plugins/nvidia_gpu) | Specifies the maximum time (in seconds) to wait for a server response during connection attempts and subsequent operations in the session. The global item-type timeout or individual item timeout will override this value if greater.
 
 ### Zabbix **agent 2 Redis plugin** parameters:
 

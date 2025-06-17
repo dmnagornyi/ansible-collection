@@ -5,6 +5,7 @@ repository_map_os_transition:
     '7': '7'
     '8': '8'
     '9': '9'
+    '10': '10'
   OracleLinux:
     '6': '6'
     '7': '7'
@@ -15,6 +16,7 @@ repository_map_os_transition:
     '7': '7'
     '8': '8'
     '9': '9'
+    '10': '10'
   Rocky:
     '8': '8'
     '9': '9'
@@ -79,6 +81,12 @@ repository_map_os_to_url:
     'Rocky': 'rocky'
     'CentOS': 'centos'
   '7.2':
+    'RedHat': 'rhel'
+    'OracleLinux': 'oracle'
+    'AlmaLinux': 'alma'
+    'Rocky': 'rocky'
+    'CentOS': 'centos'
+  '7.4':
     'RedHat': 'rhel'
     'OracleLinux': 'oracle'
     'AlmaLinux': 'alma'
