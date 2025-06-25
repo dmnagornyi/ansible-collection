@@ -79,7 +79,7 @@ agent_param_pluginsocket: '{{ agent_map_param_pluginsocket[ansible_system] }}'
 agent_param_includeplugins: '{{ agent_map_param_includeplugins[ansible_system] }}'
 
 ### agent2 Plugins:
-agent_param_plugins_mongodb_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb" 
+agent_param_plugins_mongodb_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb"
                                           if (agent_major_version <= 7.0)
                                           else "/usr/libexec/zabbix/zabbix-agent2-plugin-mongodb") }}'
 agent_param_plugins_mssql_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mssql"

@@ -43,10 +43,10 @@
         host: Integration test host 2
         proxy: 'test proxy 2'
 
-    - name: Refreshing inventory
+    - name: Refreshing inventory after adding proxy to the host
       ansible.builtin.meta: refresh_inventory
 
-    - name: Assert that both hosts were given
+    - name: Assert that both hosts were given after adding proxy to the host
       ansible.builtin.assert:
         that:
           - vars.hostvars | length == 3
@@ -64,10 +64,10 @@
         host: Integration test host 1
         proxy: 'test proxy 2'
 
-    - name: Refreshing inventory
+    - name: Refreshing inventory after adding proxy to the different host
       ansible.builtin.meta: refresh_inventory
 
-    - name: Assert that both hosts were given
+    - name: Assert that both hosts were given after adding proxy to the different host
       ansible.builtin.assert:
         that:
           - vars.hostvars | length == 3
@@ -85,10 +85,10 @@
         host: Integration test host 1
         proxy: 'inventory test proxy'
 
-    - name: Refreshing inventory
+    - name: Refreshing inventory after adding different proxy to the host
       ansible.builtin.meta: refresh_inventory
 
-    - name: Assert that both hosts were given
+    - name: Assert that both hosts were given after adding different proxy to the host
       ansible.builtin.assert:
         that:
           - vars.hostvars | length == 2
@@ -98,22 +98,22 @@
           - vars.hostvars['Integration test host 2']['zabbix_proxy_name'] == 'test proxy 2'
 
     # Add both hosts to the third proxy 'inventory test proxy', witch doesn't match with 'test proxy*'
-    - name: Add 'Integration test host 1' to the 'inventory test proxy'
+    - name: Add also 'Integration test host 1' to the 'inventory test proxy'
       zabbix.zabbix.zabbix_host:
         state: present
         host: Integration test host 1
         proxy: 'inventory test proxy'
 
-    - name: Add 'Integration test host 2' to the 'inventory test proxy'
+    - name: Add also 'Integration test host 2' to the 'inventory test proxy'
       zabbix.zabbix.zabbix_host:
         state: present
         host: Integration test host 2
         proxy: 'inventory test proxy'
 
-    - name: Refreshing inventory
+    - name: Refreshing inventory after adding both host
       ansible.builtin.meta: refresh_inventory
 
-    - name: Assert that both hosts were given
+    - name: Assert that both hosts were given after adding both host
       ansible.builtin.assert:
         that:
           - vars.hostvars | length == 1

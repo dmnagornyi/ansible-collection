@@ -40,7 +40,7 @@
             that:
               - proxy_group_support is defined
 
-    - name: Check support of the proxy group parameter
+    - name: Check support of the proxy group parameter for both hosts
       when: proxy_group_support
       block:
         # Add both hosts to the one of proxy group
