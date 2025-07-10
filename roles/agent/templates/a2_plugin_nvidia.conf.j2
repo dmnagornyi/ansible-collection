@@ -1,0 +1,24 @@
+### Option:Plugins.NVIDIA.System.Path
+#	Path to loadable plugin executable.
+#
+# Mandatory: yes
+# Default:
+# Plugins.NVIDIA.System.Path=
+{% if agent_param_plugins_nvidia_system_path is defined and agent_param_plugins_nvidia_system_path %}
+
+Plugins.NVIDIA.System.Path={{ agent_param_plugins_nvidia_system_path }}
+{% endif %}
+
+### Option: Plugins.NVIDIA.Timeout
+#	Amount of time to wait for a server to respond when first connecting and on
+#   follow up operations in the session.
+#   Global item-type timeout (or individual item timeout) will override this value if it is greater.
+#
+# Mandatory: no
+# Range: 1-30
+# Default:
+# Plugins.NVIDIA.Timeout=<Global timeout>
+{% if agent_param_plugins_nvidia_timeout is defined and agent_param_plugins_nvidia_timeout %}
+
+Plugins.NVIDIA.Timeout={{ agent_param_plugins_nvidia_timeout }}
+{% endif %}

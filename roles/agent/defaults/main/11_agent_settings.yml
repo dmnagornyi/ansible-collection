@@ -50,3 +50,4 @@ agent_2_full_plugin_list:
   - postgresql
   - redis
   - smart
+  - nvidia

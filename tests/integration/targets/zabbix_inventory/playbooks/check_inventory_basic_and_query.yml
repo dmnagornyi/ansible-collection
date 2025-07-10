@@ -129,7 +129,7 @@
           - vars.hostvars['Integration test host 2']['zabbix_test_status'] == '0'
 
     # Change status for Integration test host 2 back.
-    - name: Change status for 'Integration test host 2'
+    - name: Change status for 'Integration test host 2' to disable
       zabbix.zabbix.zabbix_host:
         state: present
         host: Integration test host 2

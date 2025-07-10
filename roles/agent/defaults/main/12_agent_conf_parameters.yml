@@ -54,17 +54,17 @@ agent_param_tlsaccept:
 agent_param_tlspskidentity: 'PSK_ID_{{ inventory_hostname }}'  # length <= 128 char
 agent_param_tlspskfile: '{{ agent_service_user_home }}/{{ agent_binary_name | upper }}/.PSK/psk_value'
 # agent_param_heartbeatfrequency:         # added in 6.4
-
-### Zabbix agentd unique parameters:
-agent_param_loadmodulepath: '{{ agent_map_param_loadmodulepath[ansible_system] }}'
-# agent_param_loadmodule:
-# agent_param_startagents: 3
 # agent_param_tlsciphercert13:
 # agent_param_tlsciphercert:
 # agent_param_tlscipherpsk13:
 # agent_param_tlscipherpsk:
 # agent_param_tlscipherall13:
 # agent_param_tlscipherall:
+
+### Zabbix agentd unique parameters:
+agent_param_loadmodulepath: '{{ agent_map_param_loadmodulepath[ansible_system] }}'
+# agent_param_loadmodule:
+# agent_param_startagents: 3
 # agent_param_listenbacklog:
 
 ### Zabbix agent2 unique parameters:
@@ -79,9 +79,16 @@ agent_param_pluginsocket: '{{ agent_map_param_pluginsocket[ansible_system] }}'
 agent_param_includeplugins: '{{ agent_map_param_includeplugins[ansible_system] }}'
 
 ### agent2 Plugins:
-agent_param_plugins_mongodb_system_path: /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb
-agent_param_plugins_mssql_system_path: /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mssql
+agent_param_plugins_mongodb_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mongodb"
+                                          if (agent_major_version <= 7.0)
+                                          else "/usr/libexec/zabbix/zabbix-agent2-plugin-mongodb") }}'
+agent_param_plugins_mssql_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-mssql"
+                                        if (agent_major_version <= 7.0)
+                                        else "/usr/libexec/zabbix/zabbix-agent2-plugin-mssql") }}'
+agent_param_plugins_nvidia_system_path: /usr/libexec/zabbix/zabbix-agent2-plugin-nvidia-gpu
 ## agent2 Plugins.PostgreSQL:
-agent_param_plugins_postgresql_system_path: /usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql
+agent_param_plugins_postgresql_system_path: '{{ ("/usr/sbin/zabbix-agent2-plugin/zabbix-agent2-plugin-postgresql"
+                                            if (agent_major_version <= 7.0)
+                                            else "/usr/libexec/zabbix/zabbix-agent2-plugin-postgresql") }}'
 agent_param_plugins_log_maxlinespersecond: '{{ agent_param_maxlinespersecond | default(None) | default(omit) }}'
 agent_param_plugins_systemrun_logremotecommands: '{{ agent_param_logremotecommands | default(None) | default(omit) }}'
