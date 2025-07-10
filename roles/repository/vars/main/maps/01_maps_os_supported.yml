@@ -20,7 +20,6 @@ repository_map_os_support:
       '7.4': ["x86_64", "aarch64"]
     '10':
       '7.0': ["x86_64", "aarch64"]
-      '7.2': ["x86_64", "aarch64"]
       '7.4': ["x86_64", "aarch64"]
   OracleLinux:
     '8':

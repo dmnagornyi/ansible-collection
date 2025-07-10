@@ -3,11 +3,11 @@ Zabbix agent role
 
 You can use this Ansible role to deploy and configure Zabbix agents on the target machines. Both agentd and agent2 variants are available.
 Currently, the following OS of target machines are supported:
-- Redhat 8, 9
+- Redhat 8, 9, 10
 - Oracle Linux 8, 9
 - Alma Linux 8, 9
 - Rocky Linux 8, 9
-- CentOS Stream 9
+- CentOS Stream 9, 10
 - Ubuntu 20.04, 22.04, 24.04
 - Debian 10, 11, 12
 - Raspberry Pi Os: 11, 12
