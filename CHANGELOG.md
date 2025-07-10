@@ -1,3 +1,15 @@
+# v1.4.2
+
+## Feature
+
+- added support for Zabbix 7.4 for roles, plugins and modules
+- moved supported ansible-core range to 2.18-2.17
+- `agent role`: added RHEL 10 support
+- `agent role`: added CentOs 10 Stream support
+- `agent role`: added Nvidia-GPU plugin support for Zabbix-agent2
+- `agent role`: added advanced encryption parameters for Zabbix-agent2
+- `agent role`: changed path to the executable files of plugins in different version
+
 # v1.4.1
 
 ## Feature
